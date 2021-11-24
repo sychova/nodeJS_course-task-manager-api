@@ -1,7 +1,9 @@
 const express = require('express')
-require('./db/mongoose')
+const db = require('./db/mongoose')
 const userRouter = require('./routers/user')
 const taskRouter = require('./routers/task')
+
+db.connect(process.env.MONGODB_URL)
 
 const app = express()
 

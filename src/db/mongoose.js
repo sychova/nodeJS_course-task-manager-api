@@ -2,9 +2,23 @@
 
 const mongoose = require('mongoose')
 
-mongoose.connect(process.env.MONGODB_URL, {
+const OPTIONS = {
     useNewUrlParser: true,
     useCreateIndex: true,
     useFindAndModify: false,
-    useUnifiedTopology: true
-})
+    useUnifiedTopology: true,
+}
+
+function connect(uri, options = {}) {
+    return new Promise((resolve) =>
+        mongoose.connect(uri, { ...OPTIONS, ...options }, () => {
+            console.debug('DB is connected')
+            resolve()
+        })
+    )
+}
+
+module.exports = {
+    connect,
+    mongoose,
+}
