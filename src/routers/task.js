@@ -2,6 +2,8 @@ const express = require('express')
 const Task = require('../models/task')
 const router = new express.Router()
 const auth = require('../middleware/auth')
+const multer = require('multer')
+const sharp = require('sharp')
 
 router.post('/tasks', auth, async(req, res) => {
     const task = new Task({
@@ -86,6 +88,49 @@ router.delete('/tasks/:id', auth, async(req, res) => {
         if (!task) {
             return res.status(404).send()
         }
+        res.status(200).send(task)
+    } catch (error) {
+        res.status(400).send(error)
+    }
+})
+
+const upload = multer({
+    limits: {
+        fileSize: 1000000
+    },
+    fileFilter(req, file, callback) {
+        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+            return callback(new Error('Please upload an image document.'))
+        }
+        callback(undefined, true)
+    }
+})
+
+router.post('/tasks/:id/logo', auth, upload.single('logo'), async(req, res) => {
+    try {
+        const task = await Task.findOne({ _id: req.params.id, createdBy: req.user._id })
+        if (!task) {
+            return res.status(404).send()
+        }
+        const buffer = await sharp(req.file.buffer).resize({ width: 250, height: 250 }).png().toBuffer()
+        task.logo = buffer
+        await task.save()
+        res.status(200).send(task)
+    } catch (error) {
+        res.status(500).send()
+    }
+}, (error, req, res, next) => {
+    res.status(500).send({ error: error.message })
+})
+
+router.delete('/tasks/:id/logo', auth, async(req, res) => {
+    try {
+        const task = await Task.findOne({ _id: req.params.id, createdBy: req.user._id })
+        if (!task) {
+            return res.status(404).send()
+        }
+        task.logo = undefined
+        await task.save()
         res.status(200).send(task)
     } catch (error) {
         res.status(400).send(error)
