@@ -24,13 +24,3 @@ module.exports = {
     sendWelcomeEmail,
     sendCancelationEmail
 }
-
-sgMail.send({
-    to: 'anastasiya.sychova@gmail.com',
-    from: 'anastasiya.sychova@gmail.com',
-    subject: 'This is my first email.',
-    text: 'Hope this works.'
-})
-
-// then
-// try node src / emails / account.js
