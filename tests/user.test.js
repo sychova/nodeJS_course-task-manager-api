@@ -23,12 +23,9 @@ describe('User signup', () => {
             })
             .expect(201)
 
-            // Assert db changed correctly
             const user = await User.findById(response.body.user._id)
             expect(user).not.toBeNull()
-        
-            // Assertions about the response
-            // expect(response.body.usser.name).toBe('Anastasiya')
+
             expect(response.body).toMatchObject({
                 user: {
                     name: 'Anastasiya',
