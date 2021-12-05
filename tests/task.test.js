@@ -66,7 +66,7 @@ describe('Getting tasks', () => {
                 .set('Authorization', `Bearer ${userTask0.tokens[0].token}`)
                 .send()
                 .expect(200)
-            expect(response.body.length).toEqual(1)
+            expect(response.body).toHaveLength(1)
         })
         
         it('Fetches only incomplete tasks', async() => {
@@ -75,7 +75,7 @@ describe('Getting tasks', () => {
                 .set('Authorization', `Bearer ${userTask0.tokens[0].token}`)
                 .send()
                 .expect(200)
-            expect(response.body.length).toEqual(1)
+            expect(response.body).toHaveLength(1)
         })
     })
     describe('Should not do', () => {
@@ -98,7 +98,7 @@ describe('Getting tasks', () => {
 
 describe('Updating tasks', () => {
     describe('Should not do', () => {
-        it.only('Should not update task with invalid title', async() => {
+        it('Should not update task with invalid title', async() => {
             await request(app)
                 .patch(`/tasks/${task1._id}`)
                 .set('Authorization', `Bearer ${userTask0.tokens[0].token}`)
