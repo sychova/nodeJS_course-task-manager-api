@@ -1,20 +1,28 @@
 const request = require('supertest')
 const app = require('../src/app')
 const User = require('../src/models/user')
-const { user0Id, user0, setupDatabase, dropDatabase } = require('./fixtures/db')
+const { 
+    user0Id,
+    user0,
+    user1Id,
+    user1,
+    setupUserDatabase
+} = require('./fixtures/usersDB')
 
-beforeEach(setupDatabase)
-afterEach(dropDatabase)
+beforeEach(setupUserDatabase)
 
 describe('User signup', () => {
     describe('Should do', () => {
         it('Should signup a new user', async() => {
-            const response = await request(app).post('/users').send({
+            const response = await request(app)
+            .post('/users')
+            .send({
                 name: 'Anastasiya',
                 email: 'a.sychova@sumatosoft.com',
                 password: 'Qwerty1234'
-            }).expect(201)
-        
+            })
+            .expect(201)
+
             // Assert db changed correctly
             const user = await User.findById(response.body.user._id)
             expect(user).not.toBeNull()
@@ -36,20 +44,26 @@ describe('User signup', () => {
 describe('User login', () => {
     describe('Should do', () => {
         test('Should login existing user', async() => {
-            const response = await request(app).post('/users/login').send({
+            const response = await request(app)
+            .post('/users/login')
+            .send({
                 email: user0.email,
                 password: user0.password
-            }).expect(200)
+            })
+            .expect(200)
             const user = await User.findById(user0Id)
             expect(response.body.token).toBe(user.tokens[1].token)
         })
     })
     describe('Should not do', () => {
         test('Should not login nonexistent user', async() => {
-            await request(app).post('/users/login').send({
+            await request(app)
+            .post('/users/login')
+            .send({
                 email: 'qqqqq@qqqqqq.qqqqq',
                 password: 'qqqqqqqq'
-            }).expect(400)
+            })
+            .expect(400)
         })
     })
 })
@@ -116,7 +130,7 @@ describe('Deleting Users', () => {
         test('Should delete account for user', async() => {
             const response = await request(app)
                 .delete('/users/me')
-                .set('Authorization', `Bearer ${user0.tokens[0].token}`)
+                .set('Authorization', `Bearer ${user1.tokens[0].token}`)
                 .send()
                 .expect(200)
             const user = await User.findById(response.body._id)
