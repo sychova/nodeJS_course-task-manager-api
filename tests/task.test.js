@@ -98,7 +98,7 @@ describe('Getting tasks', () => {
 
 describe('Updating tasks', () => {
     describe('Should not do', () => {
-        it('Should not update task with invalid title', async() => {
+        it.only('Should not update task with invalid title', async() => {
             await request(app)
                 .patch(`/tasks/${task1._id}`)
                 .set('Authorization', `Bearer ${userTask0.tokens[0].token}`)
@@ -106,7 +106,7 @@ describe('Updating tasks', () => {
                     title: ''
                 }).expect(400)
             const task = await Task.findById(task1._id)
-            expect(task.title).not.toBeNull()
+            expect(task.title).toBeTruthy()
         })
         
         it('Should not update other users task', async() => {
