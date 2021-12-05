@@ -16,7 +16,7 @@ beforeEach(setupTaskDatabase)
 
 describe('Creating tasks', () => {
     describe('Should do', () => {
-        it('Should create task for user', async() => {
+        it('Creates task for user', async() => {
             const response = await request(app)
                 .post('/tasks')
                 .set('Authorization', `Bearer ${userTask0.tokens[0].token}`)
@@ -44,7 +44,7 @@ describe('Creating tasks', () => {
 
 describe('Getting tasks', () => {
     describe('Should do', () => {
-        it('Should return all tasks of user 0', async() => {
+        it('Returns all tasks of user 0', async() => {
             const response = await request(app)
                 .get('/tasks')
                 .set('Authorization', `Bearer ${userTask0.tokens[0].token}`)
@@ -53,14 +53,14 @@ describe('Getting tasks', () => {
             expect(response.body.length).toEqual(2)
         })
         
-        it('Should fetch user task by id', async() => {
+        it('Fetches user task by id', async() => {
             await request(app)
                 .get(`/tasks/${task0._id}`)
                 .set('Authorization', `Bearer ${userTask0.tokens[0].token}`)
                 .send()
                 .expect(200)
         })
-        it('Should fetch only completed tasks', async() => {
+        it('Fetches only completed tasks', async() => {
             const response = await request(app)
                 .get('/tasks?completed=true')
                 .set('Authorization', `Bearer ${userTask0.tokens[0].token}`)
@@ -69,7 +69,7 @@ describe('Getting tasks', () => {
             expect(response.body.length).toEqual(1)
         })
         
-        it('Should fetch only incomplete tasks', async() => {
+        it('Fetches only incomplete tasks', async() => {
             const response = await request(app)
                 .get('/tasks?completed=false')
                 .set('Authorization', `Bearer ${userTask0.tokens[0].token}`)
@@ -121,7 +121,7 @@ describe('Updating tasks', () => {
 
 describe('Deleting tasks', () => {
     describe('Should do', () => {
-        it('Should delete user task', async() => {
+        it('Deletes user task', async() => {
             await request(app)
                 .delete(`/tasks/${task1._id}`)
                 .set('Authorization', `Bearer ${userTask0.tokens[0].token}`)

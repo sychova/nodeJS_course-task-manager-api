@@ -9,11 +9,11 @@ const {
     setupUserDatabase
 } = require('./fixtures/usersDB')
 
-beforeEach(setupUserDatabase)
+beforeAll(setupUserDatabase)
 
 describe('User signup', () => {
     describe('Should do', () => {
-        it('Should signup a new user', async() => {
+        it('Signs up a new user', async() => {
             const response = await request(app)
             .post('/users')
             .send({
@@ -40,7 +40,7 @@ describe('User signup', () => {
 
 describe('User login', () => {
     describe('Should do', () => {
-        test('Should login existing user', async() => {
+        it('Logs in existing user', async() => {
             const response = await request(app)
             .post('/users/login')
             .send({
@@ -53,7 +53,7 @@ describe('User login', () => {
         })
     })
     describe('Should not do', () => {
-        test('Should not login nonexistent user', async() => {
+        it('Should not login nonexistent user', async() => {
             await request(app)
             .post('/users/login')
             .send({
@@ -67,7 +67,7 @@ describe('User login', () => {
 
 describe('Getting Users', () => {
     describe('Should do', () => {
-        test('Should get profile for user', async() => {
+        it('Gets profile for user', async() => {
             await request(app)
                 .get('/users/me')
                 .set('Authorization', `Bearer ${user0.tokens[0].token}`)
@@ -76,7 +76,7 @@ describe('Getting Users', () => {
         })
     })
     describe('Should not do', () => {
-        test('Should not get profile for unauthenticated user', async() => {
+        it('Should not get profile for unauthenticated user', async() => {
             await request(app)
                 .get('/users/me')
                 .send()
@@ -87,7 +87,7 @@ describe('Getting Users', () => {
 
 describe('Updating Users', () => {
     describe('Should do', () => {
-        test('Should upload avatar image', async() => {
+        it('Uploads avatar image', async() => {
             await request(app)
                 .post('/users/me/avatar')
                 .set('Authorization', `Bearer ${user0.tokens[0].token}`)
@@ -97,7 +97,7 @@ describe('Updating Users', () => {
             expect(user.avatar).toEqual(expect.any(Buffer))
         })
         
-        test('Should update valid user fields', async() => {
+        it('Updates valid user fields', async() => {
             await request(app)
                 .patch('/users/me')
                 .set('Authorization', `Bearer ${user0.tokens[0].token}`)
@@ -124,7 +124,7 @@ describe('Updating Users', () => {
 
 describe('Deleting Users', () => {
     describe('Should do', () => {
-        test('Should delete account for user', async() => {
+        test('Deletes account for user', async() => {
             const response = await request(app)
                 .delete('/users/me')
                 .set('Authorization', `Bearer ${user1.tokens[0].token}`)
