@@ -12,9 +12,9 @@ router.post('/tasks', auth, async(req, res) => {
     })
     try {
         await task.save()
-        res.status(201).send(task)
+        res.status(201).json(task)
     } catch (error) {
-        res.status(400).send(error)
+        res.status(400).json(error)
     }
 })
 
@@ -43,9 +43,9 @@ router.get('/tasks', auth, async(req, res) => {
                 sort
             }
         }).execPopulate()
-        res.status(200).send(req.user.tasks)
+        res.status(200).json(req.user.tasks)
     } catch (error) {
-        res.status(500).send()
+        res.status(500).json()
     }
 })
 
@@ -54,11 +54,11 @@ router.get('/tasks/:id', auth, async(req, res) => {
     try {
         const task = await Task.findOne({ _id, createdBy: req.user._id })
         if (!task) {
-            return res.status(404).send()
+            return res.status(404).json()
         }
-        res.status(200).send(task)
+        res.status(200).json(task)
     } catch (error) {
-        res.status(500).send()
+        res.status(500).json()
     }
 })
 
@@ -67,18 +67,18 @@ router.patch('/tasks/:id', auth, async(req, res) => {
     const allowedUpdates = ['title', 'completed']
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
     if (!isValidOperation) {
-        return res.status(400).send({ error: 'Property doesn\'t exist.' })
+        return res.status(400).json({ error: 'Property doesn\'t exist.' })
     }
     try {
         const task = await Task.findOne({ _id: req.params.id, createdBy: req.user._id })
         if (!task) {
-            return res.status(404).send()
+            return res.status(404).json()
         }
         updates.forEach((update) => task[update] = req.body[update])
         await task.save()
-        res.send(task)
+        res.json(task)
     } catch (error) {
-        res.status(400).send(error)
+        res.status(400).json(error)
     }
 })
 
@@ -86,11 +86,11 @@ router.delete('/tasks/:id', auth, async(req, res) => {
     try {
         const task = await Task.findOneAndDelete({ _id: req.params.id, createdBy: req.user._id })
         if (!task) {
-            return res.status(404).send()
+            return res.status(404).json()
         }
-        res.status(200).send(task)
+        res.status(200).json(task)
     } catch (error) {
-        res.status(400).send(error)
+        res.status(400).json(error)
     }
 })
 
@@ -110,30 +110,30 @@ router.post('/tasks/:id/logo', auth, upload.single('logo'), async(req, res) => {
     try {
         const task = await Task.findOne({ _id: req.params.id, createdBy: req.user._id })
         if (!task) {
-            return res.status(404).send()
+            return res.status(404).json()
         }
         const buffer = await sharp(req.file.buffer).resize({ width: 250, height: 250 }).png().toBuffer()
         task.logo = buffer
         await task.save()
-        res.status(200).send(task)
+        res.status(200).json(task)
     } catch (error) {
-        res.status(500).send()
+        res.status(500).json()
     }
 }, (error, req, res, next) => {
-    res.status(500).send({ error: error.message })
+    res.status(500).json({ error: error.message })
 })
 
 router.delete('/tasks/:id/logo', auth, async(req, res) => {
     try {
         const task = await Task.findOne({ _id: req.params.id, createdBy: req.user._id })
         if (!task) {
-            return res.status(404).send()
+            return res.status(404).json()
         }
         task.logo = undefined
         await task.save()
-        res.status(200).send(task)
+        res.status(200).json(task)
     } catch (error) {
-        res.status(400).send(error)
+        res.status(400).json(error)
     }
 })
 

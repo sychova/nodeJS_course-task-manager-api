@@ -14,9 +14,9 @@ router.post('/users', async(req, res) => {
         sendWelcomeEmail(user.email, user.name)
 
         const token = await user.generateAuthToken()
-        res.status(201).send({ user, token })
+        res.status(201).json({ user, token })
     } catch (error) {
-        res.status(400).send(error)
+        res.status(400).json(error)
     }
 })
 
@@ -24,9 +24,9 @@ router.post('/users/login', async(req, res) => {
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password)
         const token = await user.generateAuthToken()
-        res.send({ user, token })
+        res.json({ user, token })
     } catch (error) {
-        res.status(400).send()
+        res.status(400).json()
     }
 })
 
@@ -36,9 +36,9 @@ router.post('/users/logout', auth, async(req, res) => {
             return token.token !== req.token
         })
         await req.user.save()
-        res.status(200).send()
+        res.status(200).json()
     } catch (error) {
-        res.status(500).send()
+        res.status(500).json()
     }
 })
 
@@ -46,14 +46,14 @@ router.post('/users/logoutAll', auth, async(req, res) => {
     try {
         req.user.tokens = []
         await req.user.save()
-        res.status(200).send()
+        res.status(200).json()
     } catch (error) {
-        res.status(500).send()
+        res.status(500).json()
     }
 })
 
 router.get('/users/me', auth, async(req, res) => {
-    res.send(req.user)
+    res.json(req.user)
 })
 
 router.patch('/users/me', auth, async(req, res) => {
@@ -61,17 +61,17 @@ router.patch('/users/me', auth, async(req, res) => {
     const allowedUpdates = ['name', 'email', 'password', 'age']
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
     if (!isValidOperation) {
-        return res.status(400).send({ error: 'Property doesn\'t exist.' })
+        return res.status(400).json({ error: 'Property doesn\'t exist.' })
     }
     try {
         updates.forEach((update) => req.user[update] = req.body[update])
         await req.user.save()
         if (!req.user) {
-            return res.status(404).send()
+            return res.status(404).json()
         }
-        res.send(req.user)
+        res.json(req.user)
     } catch (error) {
-        res.status(400).send(error)
+        res.status(400).json(error)
     }
 })
 
@@ -81,9 +81,9 @@ router.delete('/users/me', auth, async(req, res) => {
 
         sendCancelationEmail(req.user.email, req.user.name)
 
-        res.status(200).send(req.user)
+        res.status(200).json(req.user)
     } catch (error) {
-        res.status(400).send(error)
+        res.status(400).json(error)
     }
 })
 
@@ -103,15 +103,15 @@ router.post('/users/me/avatar', auth, upload.single('avatar'), async(req, res) =
     const buffer = await sharp(req.file.buffer).resize({ width: 250, height: 250 }).png().toBuffer()
     req.user.avatar = buffer
     await req.user.save()
-    res.status(200).send()
+    res.status(200).json()
 }, (error, req, res, next) => {
-    res.status(500).send({ error: error.message })
+    res.status(500).json({ error: error.message })
 })
 
 router.delete('/users/me/avatar', auth, async(req, res) => {
     req.user.avatar = undefined
     await req.user.save()
-    res.status(200).send()
+    res.status(200).json()
 })
 
 router.get('/users/:id/avatar', async(req, res) => {
@@ -121,9 +121,9 @@ router.get('/users/:id/avatar', async(req, res) => {
             throw new Error()
         }
         res.set('Content-Type', 'image/png')
-        res.status(200).send(user.avatar)
+        res.status(200).json(user.avatar)
     } catch (error) {
-        res.status(404).send(error)
+        res.status(404).json(error)
     }
 })
 
