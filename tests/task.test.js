@@ -85,7 +85,6 @@ test('Should fetch only incomplete tasks', async() => {
         .send()
         .expect(200)
     expect(response.body.length).toEqual(1)
-    console.log(response.body)
 })
 
 test('Should not update task with invalid title', async() => {
