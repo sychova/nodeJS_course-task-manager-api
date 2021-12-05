@@ -108,13 +108,12 @@ const upload = multer({
 
 router.post('/tasks/:id/logo', auth, upload.single('logo'), async(req, res) => {
     try {
-        const task = await Task.findOne({ _id: req.params.id, createdBy: req.user._id })
+        const buffer = await sharp(req.file.buffer).resize({ width: 250, height: 250 }).png().toBuffer()
+        const update = { logo: buffer }
+        const task = await Task.findOneAndUpdate({ _id: req.params.id, createdBy: req.user._id }, update, { new: true })
         if (!task) {
             return res.status(404).json()
         }
-        const buffer = await sharp(req.file.buffer).resize({ width: 250, height: 250 }).png().toBuffer()
-        task.logo = buffer
-        await task.save()
         res.status(200).json(task)
     } catch (error) {
         res.status(500).json(error)
@@ -125,12 +124,11 @@ router.post('/tasks/:id/logo', auth, upload.single('logo'), async(req, res) => {
 
 router.delete('/tasks/:id/logo', auth, async(req, res) => {
     try {
-        const task = await Task.findOne({ _id: req.params.id, createdBy: req.user._id })
+        const update = { logo: undefined }
+        const task = await Task.findOneAndUpdate({ _id: req.params.id, createdBy: req.user._id }, update, { new: true })
         if (!task) {
             return res.status(404).json()
         }
-        task.logo = undefined
-        await task.save()
         res.status(200).json(task)
     } catch (error) {
         res.status(400).json(error)
