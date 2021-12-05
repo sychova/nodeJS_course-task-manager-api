@@ -45,7 +45,7 @@ router.get('/tasks', auth, async(req, res) => {
         }).execPopulate()
         res.status(200).json(req.user.tasks)
     } catch (error) {
-        res.status(500).json()
+        res.status(500).json(error)
     }
 })
 
@@ -58,7 +58,7 @@ router.get('/tasks/:id', auth, async(req, res) => {
         }
         res.status(200).json(task)
     } catch (error) {
-        res.status(500).json()
+        res.status(500).json(error)
     }
 })
 
@@ -117,7 +117,7 @@ router.post('/tasks/:id/logo', auth, upload.single('logo'), async(req, res) => {
         await task.save()
         res.status(200).json(task)
     } catch (error) {
-        res.status(500).json()
+        res.status(500).json(error)
     }
 }, (error, req, res, next) => {
     res.status(500).json({ error: error.message })
