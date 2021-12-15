@@ -8,9 +8,11 @@ const user0 = {
     name: 'Ana',
     email: 'a.sychova0@example.com',
     password: 'Qwerty1234',
-    tokens: [{
-        token: jwt.sign({ _id: user0Id }, process.env.JWT_SECRET)
-    }]
+    tokens: [
+        {
+            token: jwt.sign({ _id: user0Id }, process.env.JWT_SECRET),
+        },
+    ],
 }
 
 const user1Id = new mongoose.Types.ObjectId()
@@ -19,12 +21,14 @@ const user1 = {
     name: 'Ana',
     email: 'a.sychova1@example.com',
     password: 'Qwerty1234',
-    tokens: [{
-        token: jwt.sign({ _id: user1Id }, process.env.JWT_SECRET)
-    }]
+    tokens: [
+        {
+            token: jwt.sign({ _id: user1Id }, process.env.JWT_SECRET),
+        },
+    ],
 }
 
-const setupUserDatabase = async() => {
+const setupUserDatabase = async () => {
     await User.deleteMany()
     await new User(user0).save()
     await new User(user1).save()
@@ -35,5 +39,5 @@ module.exports = {
     user0,
     user1Id,
     user1,
-    setupUserDatabase
+    setupUserDatabase,
 }

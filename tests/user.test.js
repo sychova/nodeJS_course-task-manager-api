@@ -1,27 +1,27 @@
 const request = require('supertest')
 const app = require('../src/app')
 const User = require('../src/models/user')
-const { 
+const {
     user0Id,
     user0,
     user1Id,
     user1,
-    setupUserDatabase
+    setupUserDatabase,
 } = require('./fixtures/usersDB')
 
 beforeAll(setupUserDatabase)
 
 describe('User signup', () => {
     describe('Should do', () => {
-        it('Signs up a new user', async() => {
+        it('Signs up a new user', async () => {
             const response = await request(app)
-            .post('/users')
-            .send({
-                name: 'Anastasiya',
-                email: 'a.sychova@sumatosoft.com',
-                password: 'Qwerty1234'
-            })
-            .expect(201)
+                .post('/users')
+                .send({
+                    name: 'Anastasiya',
+                    email: 'a.sychova@sumatosoft.com',
+                    password: 'Qwerty1234',
+                })
+                .expect(201)
 
             const user = await User.findById(response.body.user._id)
             expect(user).not.toBeNull()
@@ -29,9 +29,9 @@ describe('User signup', () => {
             expect(response.body).toMatchObject({
                 user: {
                     name: 'Anastasiya',
-                    email: 'a.sychova@sumatosoft.com'
+                    email: 'a.sychova@sumatosoft.com',
                 },
-                token: user.tokens[0].token
+                token: user.tokens[0].token,
             })
             expect(user.password).not.toBe('Qwerty1234')
         })
@@ -40,34 +40,34 @@ describe('User signup', () => {
 
 describe('User login', () => {
     describe('Should do', () => {
-        it('Logs in existing user', async() => {
+        it('Logs in existing user', async () => {
             const response = await request(app)
-            .post('/users/login')
-            .send({
-                email: user0.email,
-                password: user0.password
-            })
-            .expect(200)
+                .post('/users/login')
+                .send({
+                    email: user0.email,
+                    password: user0.password,
+                })
+                .expect(200)
             const user = await User.findById(user0Id)
             expect(response.body.token).toBe(user.tokens[1].token)
         })
     })
     describe('Should not do', () => {
-        it('Should not login nonexistent user', async() => {
+        it('Should not login nonexistent user', async () => {
             await request(app)
-            .post('/users/login')
-            .send({
-                email: 'qqqqq@qqqqqq.qqqqq',
-                password: 'qqqqqqqq'
-            })
-            .expect(400)
+                .post('/users/login')
+                .send({
+                    email: 'qqqqq@qqqqqq.qqqqq',
+                    password: 'qqqqqqqq',
+                })
+                .expect(400)
         })
     })
 })
 
 describe('Getting Users', () => {
     describe('Should do', () => {
-        it('Gets profile for user', async() => {
+        it('Gets profile for user', async () => {
             await request(app)
                 .get('/users/me')
                 .set('Authorization', `Bearer ${user0.tokens[0].token}`)
@@ -76,18 +76,15 @@ describe('Getting Users', () => {
         })
     })
     describe('Should not do', () => {
-        it('Should not get profile for unauthenticated user', async() => {
-            await request(app)
-                .get('/users/me')
-                .send()
-                .expect(401)
+        it('Should not get profile for unauthenticated user', async () => {
+            await request(app).get('/users/me').send().expect(401)
         })
     })
 })
 
 describe('Updating Users', () => {
     describe('Should do', () => {
-        it('Uploads avatar image', async() => {
+        it('Uploads avatar image', async () => {
             await request(app)
                 .post('/users/me/avatar')
                 .set('Authorization', `Bearer ${user0.tokens[0].token}`)
@@ -96,13 +93,13 @@ describe('Updating Users', () => {
             const user = await User.findById(user0Id)
             expect(user.avatar).toEqual(expect.any(Buffer))
         })
-        
-        it('Updates valid user fields', async() => {
+
+        it('Updates valid user fields', async () => {
             await request(app)
                 .patch('/users/me')
                 .set('Authorization', `Bearer ${user0.tokens[0].token}`)
                 .send({
-                    name: 'Anastasiya'
+                    name: 'Anastasiya',
                 })
                 .expect(200)
             const user = await User.findById(user0Id)
@@ -110,12 +107,12 @@ describe('Updating Users', () => {
         })
     })
     describe('Should not do', () => {
-        test('Should not update invalid user fields', async() => {
+        test('Should not update invalid user fields', async () => {
             await request(app)
                 .patch('/users/me')
                 .set('Authorization', `Bearer ${user0.tokens[0].token}`)
                 .send({
-                    location: 'Minsk'
+                    location: 'Minsk',
                 })
                 .expect(400)
         })
@@ -124,7 +121,7 @@ describe('Updating Users', () => {
 
 describe('Deleting Users', () => {
     describe('Should do', () => {
-        test('Deletes account for user', async() => {
+        test('Deletes account for user', async () => {
             const response = await request(app)
                 .delete('/users/me')
                 .set('Authorization', `Bearer ${user1.tokens[0].token}`)
@@ -135,11 +132,8 @@ describe('Deleting Users', () => {
         })
     })
     describe('Should not do', () => {
-        test('Should not delete account for unauthenticated user', async() => {
-            await request(app)
-                .delete('/users/me')
-                .send()
-                .expect(401)
+        test('Should not delete account for unauthenticated user', async () => {
+            await request(app).delete('/users/me').send().expect(401)
         })
     })
 })
