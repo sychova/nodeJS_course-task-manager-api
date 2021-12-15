@@ -4,64 +4,69 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const Task = require('./task')
 
-const userSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    email: {
-        type: String,
-        unique: true,
-        required: true,
-        trim: true,
-        lowercase: true,
-        validate(value) {
-            if (!validator.isEmail(value)) {
-                throw new Error('Email is invalid')
-            }
-        }
-    },
-    age: {
-        type: Number,
-        default: 0,
-        validate(value) {
-            if (value < 0) {
-                throw new Error('Age must be a positive number')
-            }
-        }
-    },
-    password: {
-        type: String,
-        required: true,
-        minLength: 7,
-        trim: true,
-        validate(value) {
-            if (value.toLowerCase().includes('password')) {
-                throw new Error('You can\'t use the word \'password\'.')
-            }
-        }
-    },
-    tokens: [{
-        token: {
+const userSchema = new mongoose.Schema(
+    {
+        name: {
             type: String,
-            required: true
-        }
-    }],
-    avatar: {
-        type: Buffer
+            required: true,
+            trim: true,
+        },
+        email: {
+            type: String,
+            unique: true,
+            required: true,
+            trim: true,
+            lowercase: true,
+            validate(value) {
+                if (!validator.isEmail(value)) {
+                    throw new Error('Email is invalid')
+                }
+            },
+        },
+        age: {
+            type: Number,
+            default: 0,
+            validate(value) {
+                if (value < 0) {
+                    throw new Error('Age must be a positive number')
+                }
+            },
+        },
+        password: {
+            type: String,
+            required: true,
+            minLength: 7,
+            trim: true,
+            validate(value) {
+                if (value.toLowerCase().includes('password')) {
+                    throw new Error("You can't use the word 'password'.")
+                }
+            },
+        },
+        tokens: [
+            {
+                token: {
+                    type: String,
+                    required: true,
+                },
+            },
+        ],
+        avatar: {
+            type: Buffer,
+        },
+    },
+    {
+        timestamps: true,
     }
-}, {
-    timestamps: true
-})
+)
 
 userSchema.virtual('tasks', {
     ref: 'Task',
     localField: '_id',
-    foreignField: 'createdBy'
+    foreignField: 'createdBy',
 })
 
-userSchema.methods.toJSON = function() {
+userSchema.methods.toJSON = function () {
     const user = this
     const userObject = user.toObject()
 
@@ -72,7 +77,7 @@ userSchema.methods.toJSON = function() {
     return userObject
 }
 
-userSchema.methods.generateAuthToken = async function() {
+userSchema.methods.generateAuthToken = async function () {
     const user = this
     const token = jwt.sign({ _id: user._id.toString() }, process.env.JWT_SECRET)
     user.tokens = user.tokens.concat({ token })
@@ -80,7 +85,7 @@ userSchema.methods.generateAuthToken = async function() {
     return token
 }
 
-userSchema.statics.findByCredentials = async(email, password) => {
+userSchema.statics.findByCredentials = async (email, password) => {
     const user = await User.findOne({ email })
     if (!user) {
         throw new Error('Unable to login.')
@@ -93,7 +98,7 @@ userSchema.statics.findByCredentials = async(email, password) => {
 }
 
 // Hash the plain text password before saving
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function (next) {
     const user = this
     if (user.isModified('password')) {
         user.password = await bcrypt.hash(user.password, 8)
@@ -101,7 +106,7 @@ userSchema.pre('save', async function(next) {
 })
 
 // Delete user tasks when the user is deleted
-userSchema.pre('remove', async function(next) {
+userSchema.pre('remove', async function (next) {
     const user = this
     await Task.deleteMany({ createdBy: user._id })
     next()
@@ -110,3 +115,4 @@ userSchema.pre('remove', async function(next) {
 const User = mongoose.model('User', userSchema)
 
 module.exports = User
+
