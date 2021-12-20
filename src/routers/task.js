@@ -4,6 +4,7 @@ const router = new express.Router();
 const auth = require("../middleware/auth");
 const multer = require("multer");
 const sharp = require("sharp");
+const path = require("path");
 
 router.post("/tasks", auth, async (req, res) => {
   const task = new Task({
@@ -109,10 +110,12 @@ const upload = multer({
     fileSize: 1000000,
   },
   fileFilter(req, file, callback) {
-    if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+    const allowedExtensions = [".jpg", ".jpeg", ".png"];
+    const fileExtension = path.extname(file.originalname);
+    if (!allowedExtensions.includes(fileExtension)) {
       return callback(new Error("Please upload an image document."));
     }
-    callback(undefined, true);
+    callback(null, true);
   },
 });
 
@@ -147,7 +150,7 @@ router.post(
 
 router.delete("/tasks/:id/logo", auth, async (req, res) => {
   try {
-    const update = { logo: undefined };
+    const update = { logo: null };
     const task = await Task.findOneAndUpdate(
       { _id: req.params.id, createdBy: req.user._id },
       update,
