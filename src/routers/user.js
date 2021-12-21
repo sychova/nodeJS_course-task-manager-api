@@ -1,10 +1,11 @@
 const express = require("express");
 const User = require("../models/user");
 const auth = require("../middleware/auth");
-const multer = require("multer");
+const { uploadImage } = require("../middleware/fileUpload");
 const sharp = require("sharp");
 const { sendWelcomeEmail, sendCancelationEmail } = require("../emails/account");
 const router = new express.Router();
+const multer = require("multer");
 
 router.post("/users", async (req, res) => {
   const user = new User(req.body);
@@ -92,24 +93,10 @@ router.delete("/users/me", auth, async (req, res) => {
   }
 });
 
-const upload = multer({
-  limits: {
-    fileSize: 1000000,
-  },
-  fileFilter(req, file, callback) {
-    const allowedExtensions = [".jpg", ".jpeg", ".png"];
-    const fileExtension = path.extname(file.originalname);
-    if (!allowedExtensions.includes(fileExtension)) {
-      return callback(new Error("Please upload an image document."));
-    }
-    callback(undefined, true);
-  },
-});
-
 router.post(
   "/users/me/avatar",
   auth,
-  upload.single("avatar"),
+  uploadImage().single("avatar"),
   async (req, res) => {
     const buffer = await sharp(req.file.buffer)
       .resize({ width: 250, height: 250 })
