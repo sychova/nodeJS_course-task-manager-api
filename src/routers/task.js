@@ -129,10 +129,9 @@ router.post(
         .resize({ width: 250, height: 250 })
         .png()
         .toBuffer();
-      const update = { logo: buffer };
       const task = await Task.findOneAndUpdate(
         { _id: req.params.id, createdBy: req.user._id },
-        update,
+        { logo: buffer },
         { new: true }
       );
       if (!task) {
