@@ -105,9 +105,6 @@ router.post(
     req.user.avatar = buffer;
     await req.user.save();
     res.json();
-  },
-  (error, req, res, next) => {
-    res.status(500).json({ error: error.message });
   }
 );
 
