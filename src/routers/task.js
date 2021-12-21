@@ -141,9 +141,6 @@ router.post(
     } catch (error) {
       res.status(500).json(error);
     }
-  },
-  (error, req, res, next) => {
-    res.status(500).json({ error: error.message });
   }
 );
 
