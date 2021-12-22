@@ -8,8 +8,8 @@ const router = new express.Router();
 const multer = require("multer");
 
 router.post("/users", async (req, res) => {
-  const user = new User(req.body);
   try {
+    const user = new User(req.body);
     await user.save();
 
     sendWelcomeEmail(user.email, user.name);
@@ -61,15 +61,16 @@ router.get("/users/me", auth, async (req, res) => {
 });
 
 router.patch("/users/me", auth, async (req, res) => {
-  const updates = Object.keys(req.body);
-  const allowedUpdates = ["name", "email", "password", "age"];
-  const isValidOperation = updates.every((update) =>
-    allowedUpdates.includes(update)
-  );
-  if (!isValidOperation) {
-    return res.status(400).json({ error: "Property doesn't exist." });
-  }
   try {
+    const updates = Object.keys(req.body);
+    const allowedUpdates = ["name", "email", "password", "age"];
+    const isValidOperation = updates.every((update) =>
+      allowedUpdates.includes(update)
+    );
+    if (!isValidOperation) {
+      return res.status(400).json({ error: "Property doesn't exist." });
+    }
+
     updates.forEach((update) => (req.user[update] = req.body[update]));
     await req.user.save();
     if (!req.user) {
@@ -109,9 +110,13 @@ router.post(
 );
 
 router.delete("/users/me/avatar", auth, async (req, res) => {
-  req.user.avatar = null;
-  await req.user.save();
-  res.json();
+  try {
+    req.user.avatar = null;
+    await req.user.save();
+    res.json();
+  } catch (error) {
+    res.status(400).json(error);
+  }
 });
 
 router.get("/users/:id/avatar", async (req, res) => {
