@@ -1,7 +1,7 @@
 const multer = require("multer");
 const path = require("path");
 
-const uploadImage = (file) => {
+const uploadImage = () => {
   return multer({
     limits: {
       fileSize: 1000000,
