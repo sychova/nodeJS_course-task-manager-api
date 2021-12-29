@@ -146,7 +146,7 @@ describe('PATCH /tasks/:id', () => {
 
         it('returns error value', async () => {
             const { body } = await subject()
-            expect(body).toEqual({})
+            expect(body).toEqual('')
         })
     })
 

@@ -155,7 +155,7 @@ describe('GET /tasks', () => {
 
         it('does not return the task', async () => {
             const { body } = await subject()
-            expect(body).toEqual({})
+            expect(body).toEqual('')
         })
     })
 })
