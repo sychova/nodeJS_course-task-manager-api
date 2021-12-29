@@ -2,7 +2,8 @@ const User = require('../../src/models/user')
 const Task = require('../../src/models/task')
 
 const id = {
-    toString: () => Date.now(),
+    toString: () =>
+        `${process.env.JEST_WORKER_ID || 0}-${Math.random()}-${Date.now()}`,
 }
 
 const userFactory = {
