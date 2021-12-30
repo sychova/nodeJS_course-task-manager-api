@@ -1,10 +1,22 @@
 // C:\Users\User\mongodb\bin\mongod.exe --dbpath=C:\Users\User\mongodb-data
 
+const util = require('util')
 const mongoose = require('mongoose')
 
-mongoose.connect(process.env.MONGODB_URL, {
+const OPTIONS = {
     useNewUrlParser: true,
     useCreateIndex: true,
     useFindAndModify: false,
-    useUnifiedTopology: true
-})
+    useUnifiedTopology: true,
+}
+
+mongooseConnect = util.promisify(mongoose.connect)
+
+function connect(uri, options = {}) {
+    return mongooseConnect(uri, { ...OPTIONS, ...options })
+}
+
+module.exports = {
+    connect,
+    mongoose,
+}
